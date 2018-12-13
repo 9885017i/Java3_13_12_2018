@@ -1,6 +1,6 @@
 package generics;
 
-public interface IStorage<E extends Comparable<E>> {
+public interface IStorage<E extends Comparable<? super E>> {
 
     void add(E value);
 
@@ -14,5 +14,9 @@ public interface IStorage<E extends Comparable<E>> {
 
     void display();
 
+    Pair<Integer, IllegalArgumentException> indexOf(E value);
+
     void sort();
+
+    int getCurrentSize();
 }

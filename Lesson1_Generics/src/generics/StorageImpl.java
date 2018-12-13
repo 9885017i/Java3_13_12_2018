@@ -1,11 +1,21 @@
 package generics;
 
+import java.io.Serializable;
 import java.lang.reflect.Array;
 
-public class StorageImpl<E extends Comparable<E>> implements IStorage<E> {
+public class StorageImpl<E extends Object & Comparable<E> & Serializable> implements IStorage<E> {
 
     private E[] data;
     private int currentSize;
+
+    public StorageImpl(E[] data) {
+        this.data = data;
+    }
+
+    public StorageImpl(int maxSize) {
+//        E[] arr = new E[maxSize];
+        this.data = (E[]) new Object[maxSize];
+    }
 
     public StorageImpl(Class<E> type, int maxSize) {
         this.data = (E[]) Array.newInstance(type, maxSize);
@@ -30,7 +40,7 @@ public class StorageImpl<E extends Comparable<E>> implements IStorage<E> {
 
     @Override
     public E get(int index) {
-        return data[index] = null;
+        return data[index];
     }
 
     @Override
@@ -51,16 +61,31 @@ public class StorageImpl<E extends Comparable<E>> implements IStorage<E> {
     }
 
     @Override
+    public Pair<Integer, IllegalArgumentException> indexOf(E value) {
+        for (int i = 0; i < currentSize; i++) {
+            if (value.equals(data[i])) {
+                return Pair.create(i);
+            }
+        }
+        return new Pair<>(null, new IllegalArgumentException("Failed to found position for element "+ value));
+    }
+
+    @Override
     public void sort() {
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data.length - 1 - i; j++) {
-                E a = data[i];
-                E b = data[j];
+        for (int i = 0; i < currentSize; i++) {
+            for (int j = 0; j < currentSize - 1 - i; j++) {
+                E a = data[j];
+                E b = data[j + 1];
                 if (a.compareTo(b) > 0) {
-                    exchange(i, j);
+                    exchange(j, j + 1);
                 }
             }
         }
+    }
+
+    @Override
+    public int getCurrentSize() {
+        return currentSize;
     }
 
     private void exchange(int i, int j) {

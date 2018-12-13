@@ -15,4 +15,6 @@ public interface Storage {
     void display();
 
     void sort();
+
+    int getCurrentSize();
 }
