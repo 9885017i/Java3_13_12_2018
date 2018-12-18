@@ -20,7 +20,20 @@ public class SimpleJdbcDAO implements ClientDAO {
 
     @Override
     public List<Client> getAllClients() {
-        return null;
+        List<Client> result = new ArrayList<>();
+        try {
+            Statement statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT * FROM Client");
+            while ( resultSet.next() ) {
+                Client client = createClient(resultSet);
+                List<Phone> phones = getAllPhonesForClient(client.getId());
+                client.getPhones().addAll(phones);
+               result.add(client);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Failed to execute query", e);
+        }
+        return result;
     }
 
     @Override
@@ -85,6 +98,13 @@ public class SimpleJdbcDAO implements ClientDAO {
 
     @Override
     public boolean removeClient(int clientId) {
+        try {
+            PreparedStatement ps = connection.prepareStatement("DELETE FROM Client WHERE ID = ?");
+            ps.setInt(1, clientId);
+            return  ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
         return false;
     }
